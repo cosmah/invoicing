@@ -75,8 +75,8 @@ editor.getBinder().forField(quantity)
     .withConverter(
         new StringToDoubleConverter("Must enter a number"))
     .bind(
-        invoice -> Double.toString(invoice.getQuantity()), 
-        (invoice, fieldValue) -> invoice.setQuantity(Double.parseDouble(fieldValue))
+        invoice -> Double.valueOf(Double.toString(invoice.getQuantity())),
+        (invoice, fieldValue) -> invoice.setQuantity(Double.parseDouble(String.valueOf(fieldValue)))
     );
 
 TextField unitPrice = new TextField();
@@ -85,8 +85,8 @@ editor.getBinder().forField(unitPrice)
     .withConverter(
         new StringToDoubleConverter("Must enter a number"))
     .bind(
-        invoice -> Double.toString(invoice.getUnitPrice()), 
-        (invoice, fieldValue) -> invoice.setUnitPrice(Double.parseDouble(fieldValue))
+        invoice -> Double.valueOf(Double.toString(invoice.getUnitPrice())),
+        (invoice, fieldValue) -> invoice.setUnitPrice(Double.parseDouble(String.valueOf(fieldValue)))
     );
 
 TextField totalPrice = new TextField();
@@ -95,8 +95,8 @@ editor.getBinder().forField(totalPrice)
     .withConverter(
         new StringToDoubleConverter("Must enter a number"))
     .bind(
-        invoice -> Double.toString(invoice.getTotalPrice()), 
-        (invoice, fieldValue) -> invoice.setTotalPrice(Double.parseDouble(fieldValue))
+        invoice -> Double.valueOf(Double.toString(invoice.getTotalPrice())),
+        (invoice, fieldValue) -> invoice.setTotalPrice(Double.parseDouble(String.valueOf(fieldValue)))
     );
 
 TextField total = new TextField();
@@ -105,8 +105,8 @@ editor.getBinder().forField(total)
     .withConverter(
         new StringToDoubleConverter("Must enter a number"))
     .bind(
-        invoice -> Double.toString(invoice.getTotal()), 
-        (invoice, fieldValue) -> invoice.setTotal(Double.parseDouble(fieldValue))
+        invoice -> Double.valueOf(Double.toString(invoice.getTotal())),
+        (invoice, fieldValue) -> invoice.setTotal(Double.parseDouble(String.valueOf(fieldValue)))
     );
 
         grid.addItemClickListener(event -> {
