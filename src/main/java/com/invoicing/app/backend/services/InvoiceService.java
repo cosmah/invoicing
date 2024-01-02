@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.invoicing.app.backend.entities.Invoice;
 import com.invoicing.app.backend.repositories.InvoiceRepo;
-import com.vaadin.flow.component.html.DescriptionList.Term;
-import com.vaadin.flow.data.provider.DataProvider;
 
 @Service
 public class InvoiceService {
@@ -24,12 +22,13 @@ public class InvoiceService {
         return invoiceRepo.count();
     }
 
-    public void save(Invoice invoice) {
+    public Invoice save(Invoice invoice) {
         if (invoice == null) {
             LOGGER.info("Invoice is null. Are you sure you have connected your form to the application?");
-            return;
+            return invoice;
         }
         invoiceRepo.save(invoice);
+        return invoice;
     }
 
     public void delete(Invoice invoice) {
