@@ -35,7 +35,7 @@ public class CreateInvoice extends VerticalLayout {
 
     public CreateInvoice(InvoiceService invoiceService) {
         this.invoiceService = invoiceService;
-
+    
         formLayout.addFormItem(productName, "Product Name");
         formLayout.addFormItem(productCode, "Product Code");
         formLayout.addFormItem(description, "Description");
@@ -43,18 +43,24 @@ public class CreateInvoice extends VerticalLayout {
         formLayout.addFormItem(unitPrice, "Unit Price");
         formLayout.addFormItem(totalPrice, "Total Price");
         formLayout.addFormItem(total, "Total");
-
+    
+        VerticalLayout formLayoutWithButtons = new VerticalLayout();
+        formLayoutWithButtons.add(showFormButton);
+    
         showFormButton.addClickListener(event -> {
-            add(formLayout, add, save, hideFormButton);
-            remove(showFormButton);
+            formLayoutWithButtons.add(formLayout, add, save, hideFormButton);
+            formLayoutWithButtons.remove(showFormButton);
         });
-
+    
         hideFormButton.addClickListener(event -> {
-            remove(formLayout, add, save, hideFormButton);
-            add(showFormButton);
+            formLayoutWithButtons.remove(formLayout, add, save, hideFormButton);
+            formLayoutWithButtons.add(showFormButton);
         });
-
-        add(showFormButton, grid);
+    
+        grid.setItems(invoiceList);
+    
+        add(formLayoutWithButtons, grid); // Add the form layout with buttons and the grid to the main layout
+    
 
         grid.setItems(invoiceList);
 
