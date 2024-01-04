@@ -17,6 +17,8 @@ import java.util.List;
 @Route("create-invoice")
 public class CreateInvoice extends VerticalLayout {
 
+    private TextField totalDisplay = new TextField("Total Display");
+
     private TextField productName = new TextField("Product Name");
     private TextField productCode = new TextField("Product Code");
     private TextField description = new TextField("Description");
@@ -35,38 +37,41 @@ public class CreateInvoice extends VerticalLayout {
 
     public CreateInvoice(InvoiceService invoiceService) {
         this.invoiceService = invoiceService;
-    
+
         formLayout.addFormItem(productName, "Product Name");
         formLayout.addFormItem(productCode, "Product Code");
         formLayout.addFormItem(description, "Description");
         formLayout.addFormItem(quantity, "Quantity");
         formLayout.addFormItem(unitPrice, "Unit Price");
         formLayout.addFormItem(totalPrice, "Total Price");
-        formLayout.addFormItem(total, "Total");
-    
+        formLayout.addFormItem(totalDisplay, "Total Display");
+
+        // Add value change listeners to quantity and unitPrice fields
+        quantity.addValueChangeListener(event -> calculateTotalPrice());
+        unitPrice.addValueChangeListener(event -> calculateTotalPrice());
+
         VerticalLayout formLayoutWithButtons = new VerticalLayout();
         formLayoutWithButtons.add(showFormButton);
-    
+
         showFormButton.addClickListener(event -> {
-            formLayoutWithButtons.add(formLayout, add, save, hideFormButton);
+            formLayoutWithButtons.add(formLayout, add, hideFormButton);
             formLayoutWithButtons.remove(showFormButton);
         });
-    
+
         hideFormButton.addClickListener(event -> {
-            formLayoutWithButtons.remove(formLayout, add, save, hideFormButton);
+            formLayoutWithButtons.remove(formLayout, add, hideFormButton);
             formLayoutWithButtons.add(showFormButton);
         });
-    
+
         grid.setItems(invoiceList);
-    
+
         add(formLayoutWithButtons, grid); // Add the form layout with buttons and the grid to the main layout
-    
 
         grid.setItems(invoiceList);
 
         add.addClickListener(event -> {
             if (productName.isEmpty() || productCode.isEmpty() || description.isEmpty() ||
-                quantity.isEmpty() || unitPrice.isEmpty() || totalPrice.isEmpty() || total.isEmpty()) {
+                    quantity.isEmpty() || unitPrice.isEmpty() || totalPrice.isEmpty()) {
                 Notification.show("Please fill in all fields", 3000, Notification.Position.MIDDLE);
             } else {
                 Invoice invoice = new Invoice();
@@ -80,6 +85,20 @@ public class CreateInvoice extends VerticalLayout {
 
                 invoiceList.add(invoice);
                 grid.getDataProvider().refreshAll();
+
+                /// Calculate the sum of all total prices and set it to the total field
+                double sum = invoiceList.stream()
+                        .mapToDouble(Invoice::getTotalPrice)
+                        .sum();
+                total.setValue(sum);
+                totalDisplay.setValue(String.format("%,.2f", sum));
+                // Clear the text fields
+                productName.clear();
+                productCode.clear();
+                description.clear();
+                quantity.clear();
+                unitPrice.clear();
+                totalPrice.clear();
             }
         });
 
@@ -89,7 +108,30 @@ public class CreateInvoice extends VerticalLayout {
                 System.out.println("Saved invoice with ID: " + savedInvoice.getId());
             });
             Notification.show("Invoices saved successfully!", 3000, Notification.Position.MIDDLE);
+
+            invoiceList.clear();
+            grid.getDataProvider().refreshAll();
+
+            productName.clear();
+            productCode.clear();
+            description.clear();
+            quantity.clear();
+            unitPrice.clear();
+            totalPrice.clear();
+            total.clear();
         });
+
+        // Make the totalDisplay field read-only
+        totalDisplay.setReadOnly(true);
+
+        // Create a layout manager
+        VerticalLayout layout = new VerticalLayout();
+
+        // Add the grid, totalDisplay field, and save button to the layout
+        layout.add(grid, totalDisplay, save);
+
+        // Add the layout to the parent container
+        add(layout);
 
         // Add some styling
         setAlignItems(Alignment.CENTER);
@@ -97,8 +139,18 @@ public class CreateInvoice extends VerticalLayout {
                 new FormLayout.ResponsiveStep("0", 1),
                 new FormLayout.ResponsiveStep("600px", 2),
                 new FormLayout.ResponsiveStep("900px", 3));
-        grid.setColumns("productName", "productCode", "description", "quantity", "unitPrice", "totalPrice", "total");
+        grid.setColumns("productName", "productCode", "description", "quantity", "unitPrice", "totalPrice");
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
         save.getElement().getThemeList().set("primary", true);
+    }
+
+    // Define the calculateTotalPrice method
+    private void calculateTotalPrice() {
+        if (!quantity.isEmpty() && !unitPrice.isEmpty()) {
+            double qty = quantity.getValue();
+            double price = unitPrice.getValue();
+            double total = qty * price;
+            totalPrice.setValue(total);
+        }
     }
 }
